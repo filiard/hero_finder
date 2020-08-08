@@ -1,40 +1,25 @@
-from mss import mss
-from PIL import Image
 import functions
 
-im = mss().shot()
+source_image = r'monitor-1.jpg'
 
-extracted_miniatures = functions.extract_miniatures(im)
+heroes_to_find = functions.read_heroes_text(source_image)
 
-# import model miniatures #
-models = functions.import_models()
+hero_models = functions.import_models()
 
-hero1 = extracted_miniatures[44]
+pics_in_screenshot = functions.extract_miniatures(source_image)
+found_positions = []
+found_coords = []
 
+for hero in heroes_to_find:
+    found_positions.append(functions.find_hero_position(hero))
 
-hero2 = models[functions.find_best_match(hero1)]        #hero2 = predicted hero
+for position in found_positions:
+    found_coords.append(functions.find_coords(position))
 
+global last_img
 
-#dupa = functions.models[functions.find_best_match(hero1)]
-#functions.get_concat_h(Image.fromarray(hero1), Image.fromarray(hero2)).show()
+for coord in found_coords:
+    last_img = functions.draw_box(coord)
 
-functions.read_heroes_text()
-
-
-
-
-
-
-
-# Image.fromarray(models[0]).show()
-
-# cent1 = models[0]
-# cent11 = cent1.astype(np.int16)
-# cent2 = miniatures[48]
-# cent22 = cent2.astype(np.int16)
-
-# res = np.abs(np.subtract(cent11, cent22))
-# res2=np.sum(res)
-# Image.fromarray(res).imshow()
-
-# print("dupa2")
+last_img.show()
+print("KONIEC")
