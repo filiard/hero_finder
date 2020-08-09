@@ -1,4 +1,5 @@
 import functions
+from PIL import Image
 
 source_image = r'monitor-1.jpg'
 

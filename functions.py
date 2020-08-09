@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw, ImageGrab
+from difflib import get_close_matches
 import numpy as np
 import glob
 import pytesseract
@@ -34,9 +35,7 @@ def extract_miniatures(im, left_position=left_position, top_position=top_positio
     for y in range(6):
         for x in range(16):
             im_crop = im.crop((left_position, top_position, end_left, end_top))
-
             extracted_miniatures.append(np.asarray(im_crop))
-
             left_position += 50
             end_left += 50
         left_position = 554
@@ -88,24 +87,24 @@ def find_best_match(extracted):
 
 
 def read_heroes_text(source_image):
+    allkeys = list(dict.keys())
     image = Image.open(source_image).convert('LA').crop((562, 320, 562 + 800, 320 + 25))
     heroes = pytesseract.image_to_string(image)[27:].split("/")
     heroes_stripped = []
     for hero in heroes:
-        heroes_stripped.append(hero.strip())
+        hero = get_close_matches(hero.strip(), allkeys)[0]
+        if hero in dict:
+            heroes_stripped.append(hero.strip())
     return heroes_stripped
 
 
 def find_hero_position(hero):
-    if dict.get(hero) >= 0:
-        model_picture = hero_models[dict.get(hero)]
-        differences = []
-        for pic in pics_in_screenshot:
-            diff = mse(model_picture, pic)
-            differences.append(diff)
-        return np.argmin(differences)
-    else:
-        return 0
+    model_picture = hero_models[dict.get(hero)]
+    differences = []
+    for pic in pics_in_screenshot:
+        diff = mse(model_picture, pic)
+        differences.append(diff)
+    return np.argmin(differences)
 
 
 def find_coords(position, initial_left=left_position, initial_top=top_position, initial_end_left=end_left, initial_end_top=end_top):
