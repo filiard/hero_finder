@@ -89,6 +89,7 @@ def find_best_match(extracted):
 def read_heroes_text(source_image):
     allkeys = list(dict.keys())
     image = Image.open(source_image).convert('LA').crop((562, 320, 562 + 800, 320 + 25))
+    print(pytesseract.image_to_string(image))
     heroes = pytesseract.image_to_string(image)[27:].split("/")
     heroes_stripped = []
     for hero in heroes:
